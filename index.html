@@ -1,12 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-    StackO-Game
-</body>
+    <link rel="stylesheet" href="index.css" />
+    
+  </head>
+  <body>
+    <h2>StackO-Game</h2>
+    <div id="main-container">
+      <div id="navbar">
+        <div>Timer <span id="timer"></span></div>
+        <div>Score <span id="score"></span></div>
+        <div>Tiles Left <span id="tiles"></span></div>
+      </div>
+      <div id="container"></div>
+      <div id="all">
+        <button id="delete" onclick="deletee()">Delete</button>
+        <div id="res"></div>
+        <button id="submit" onclick="submit()">Submit</button>
+      </div>
+    </div>
+  </body>
 </html>
+<script>
+  let words = "AEIOUBCFGHLMNRSTVWY";
+  let result = document.getElementById("res");
+
+  let ls = {};
+  let res = [];
+  result.addEventListener("click", () => {
+    res.pop();
+    result.innerText = res.join("");
+  });
+
+  let obj = {};
+  for (let i = 0; i < words.length; i++) {
+    obj[words[i]] = Math.floor(Math.random() * 4) + 1;
+  }
+
+  let sum = Object.values(obj).reduce((a, b) => a + b, 0);
+  console.log(obj, sum);
+
+  let score = 0;
+  let A1 = ["A", "E", "I", "O", "U", "L", "N", "S", "T", "R"];
+  let A2 = ["D", "G"];
+  let A3 = ["B", "C", "M", "P"];
+  let A4 = ["F", "H", "V", "W", "Y"];
+  let A5 = ["K"];
+  let A6 = ["J", "X"];
+  let A7 = ["Q", "Z"];
+
+  let DL = "B";
+  let TL = "G";
+  let DW = "F";
+  let TW = "W";
+
+  let tiles = document.getElementById("tiles");
+  tiles.innerText = sum;
+
+  let container = document.getElementById("container");
+  for (let i = 0; i < words.length; i++) {
+    let div = document.createElement("div");
+
+    let p = document.createElement("p");
+    p.innerText = obj[words[i]];
+    p.setAttribute("id", words[i]);
+
+    let h3 = document.createElement("h3");
+    h3.innerText = words[i];
+
+    if (words[i] == DL) {
+      div.style.backgroundColor = "rgb(246,149,0)";
+      let p1 = document.createElement("p");
+      p1.innerText = "DL";
+      p1.className = "DL";
+      div.append(p1);
+    } else if (words[i] == TL) {
+      div.style.backgroundColor = "rgb(59,143,157)";
+      let p1 = document.createElement("p");
+      p1.innerText = "TL";
+      p1.className = "DL";
+      div.append(p1);
+    } else if (words[i] == DW) {
+      div.style.backgroundColor = "rgb(5,167,1)";
+      let p1 = document.createElement("p");
+      p1.innerText = "DW";
+      p1.className = "DL";
+      div.append(p1);
+    } else if (words[i] == TW) {
+      div.style.backgroundColor = "yellow";
+      let p1 = document.createElement("p");
+      p1.innerText = "TW";
+      p1.className = "DL";
+      div.append(p1);
+    }
+
+    div.append(h3, p);
+    div.setAttribute("id", words[i] + 1);
+    div.addEventListener("click", () => {
+      res.push(h3.innerText);
+      let count = +document.getElementById(h3.innerText).innerText - 1;
+
+      document.getElementById(h3.innerText).innerText = count;
+
+      sum--;
+      tiles.innerText = sum;
+
+      if (count == 0) {
+        document.getElementById(h3.innerText + 1).style.visibility = "hidden";
+      }
+
+      addWord();
+    });
+    container.append(div);
+  }
+
+  function addWord() {
+    result.innerText = "";
+    result.innerText = res.join("");
+  }
+
+  function checkPoints(str) {
+    if (A1.includes(str)) {
+      return 1;
+    } else if (A2.includes(str)) {
+      return 2;
+    } else if (A3.includes(str)) {
+      return 3;
+    } else if (A4.includes(str)) {
+      return 4;
+    } else if (A5.includes(str)) {
+      return 5;
+    } else if (A6.includes(str)) {
+      return 8;
+    } else if (A7.includes(str)) {
+      return 10;
+    }
+  }
+
+  function submit() {
+    let str = document.getElementById("res").innerText;
+    let count = 0;
+    for (let i = 0; i < str.length; i++) {
+      count += checkPoints(str[i]) * CL(str[i]);
+    }
+    if (str.includes(DW)) {
+      count *= 2;
+    } else if (str.includes(TW)) {
+      count *= 3;
+    }
+    score += count;
+    document.getElementById("score").innerText = score;
+    ls[str] = count;
+
+    document.getElementById("res").innerText = "";
+    res = [];
+
+    if (sum == 0) {
+      localStorage.setItem("total", JSON.stringify(ls));
+      window.location.href = "nxtPage.html";
+    }
+  }
+
+ 
+
+  let ct = 100;
+  let timer = setInterval(() => {
+    ct--;
+    document.getElementById("timer").innerText = ct;
+    if (ct == 0) {
+      clearInterval(timer);
+      localStorage.setItem("total", JSON.stringify(ls));
+        window.location.href = "nxtPage.html";
+    }
+  }, 1000);
+
+  function CL(str) {
+    if (str == DL) {
+      return 2;
+    } else if (str == TL) {
+      return 3;
+    } else return 1;
+  }
+
+  function deletee() {
+    result.innerText = "";
+    res=[]
+  }
+</script>
